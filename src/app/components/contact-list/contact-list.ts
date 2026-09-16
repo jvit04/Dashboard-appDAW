@@ -1,22 +1,30 @@
-import { Component } from '@angular/core';
-import { ContactRow } from '../contact-row/contact-row';
+import { Component, OnInit, inject } from "@angular/core";
+import { ContactRow } from "../contact-row/contact-row";
+import { ContactsService } from "../../servicios/contacts";
+
+export interface Contact {
+  id: number;
+  name: string;
+  email: string;
+}
 
 @Component({
   standalone: true,
   imports: [ContactRow],
   selector: 'app-contact-list',
-  styleUrl: './contact-list.css',
   templateUrl: './contact-list.html',
 })
-export class ContactList {
-  contacts: Contact[] = [
-    {id: 1, name: 'Maria López',email: 'maria@example.com'},
-    { id:2, name: 'Carlos Ruiz', email: 'carlos@example.com'},
-  ];
+export class ContactList implements OnInit{
+  private contactsService = inject(ContactsService);
+  contacts: Contact[] = [];
+  cargando = true;
+
+
+  ngOnInit(): void {
+    this.contactsService.getContacts().subscribe({
+      next: (d) => { this.contacts = d; this.cargando =false;},
+      error: () => { this.cargando = false; }
+    });
+  }
 }
 
-export interface Contact{
-  id: number;
-  name: string;
-  email: string;
-}
